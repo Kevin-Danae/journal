@@ -22,7 +22,7 @@
     <textarea placeholder="Que hiciste el dia de hoy?"></textarea>
   </div>
 
-  <Fab />
+  <Fab icon="fa-save" />
   <img
     src="https://www.japonalternativo.com/wp-content/uploads/2020/02/preparativos-antes-de-viajar-a-Jap%C3%B3n.jpg"
     alt="entry-picture"
