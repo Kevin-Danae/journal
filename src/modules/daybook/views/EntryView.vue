@@ -1,9 +1,9 @@
 <template>
   <div class="entry-title d-flex justify-content-between p-2">
     <div>
-      <span class="text-success fs-3 fw-bold">14</span>
-      <span class="mx-1 fs-3">Julio</span>
-      <span class="mx-1 fs-4 fw-light">2021, jueves</span>
+      <span class="text-success fs-3 fw-bold"> {{ day }} </span>
+      <span class="mx-1 fs-3"> {{ month }} </span>
+      <span class="mx-1 fs-4 fw-light"> {{ year }} </span>
     </div>
     <div>
       <button class="btn btn-danger mx-2">
@@ -19,22 +19,73 @@
 
   <hr />
   <div class="d-flex flex-column px-3 h-75">
-    <textarea placeholder="Que hiciste el dia de hoy?"></textarea>
+    <textarea
+      placeholder="Que hiciste el dia de hoy?"
+      v-model="entry.text"
+    ></textarea>
   </div>
 
   <Fab icon="fa-save" />
-  <img
-    src="https://www.japonalternativo.com/wp-content/uploads/2020/02/preparativos-antes-de-viajar-a-Jap%C3%B3n.jpg"
-    alt="entry-picture"
-    class="img-thumbnail"
-  />
+  <img :src="entry.picture" alt="entry-picture" class="img-thumbnail" />
 </template>
 
 <script>
 import { defineAsyncComponent } from "@vue/runtime-core";
+import { mapGetters } from "vuex";
+import getDate from "../helpers/getDate";
+
 export default {
+  props: {
+    entryId: {
+      type: String,
+      required: true,
+    },
+  },
+
   components: {
     Fab: defineAsyncComponent(() => import("../components/Fab.vue")),
+  },
+
+  data() {
+    return {
+      entry: {},
+    };
+  },
+
+  computed: {
+    ...mapGetters({
+      entryById: "journal/getEntryById",
+    }),
+    day() {
+      const { day } = getDate(this.entry.date);
+      return day;
+    },
+    month() {
+      const { month } = getDate(this.entry.date);
+      return month;
+    },
+    year() {
+      const { yearDay } = getDate(this.entry.date);
+      return yearDay;
+    },
+  },
+
+  methods: {
+    loadEntry() {
+      const entry = this.entryById(this.entryId);
+      if (!entry) return this.$router.push({ name: "no-entry" });
+      this.entry = entry;
+    },
+  },
+
+  created() {
+    this.loadEntry();
+  },
+
+  watch: {
+    entryId() {
+      this.loadEntry();
+    },
   },
 };
 </script>
