@@ -6,10 +6,11 @@
       <span class="mx-1 fs-4 fw-light"> {{ year }} </span>
     </div>
     <div>
-      <button class="btn btn-danger mx-2">
+      <button class="btn btn-danger mx-2" @click="onDelete" v-if="entry.id">
         Borrar
         <i class="fa fa-trash-alt"></i>
       </button>
+      <input type="file" @change="onSelectImage" />
       <button class="btn btn-primary">
         Subir foto
         <i class="fa fa-upload"></i>
@@ -25,13 +26,26 @@
     ></textarea>
   </div>
 
-  <Fab icon="fa-save" />
-  <img :src="entry.picture" alt="entry-picture" class="img-thumbnail" />
+  <Fab icon="fa-save" @on:click="savedEntry" />
+  <img
+    v-if="entry?.picture"
+    :src="entry.picture"
+    alt="entry-picture"
+    class="img-thumbnail"
+  />
+
+  <img
+    v-if="localImage"
+    :src="localImage"
+    alt="imagen local"
+    class="img-thumbnail"
+  />
 </template>
 
 <script>
 import { defineAsyncComponent } from "@vue/runtime-core";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
+import Swal from "sweetalert2";
 import getDate from "../helpers/getDate";
 
 export default {
@@ -49,6 +63,7 @@ export default {
   data() {
     return {
       entry: {},
+      localImage: null,
     };
   },
 
@@ -71,10 +86,69 @@ export default {
   },
 
   methods: {
+    ...mapActions("journal", ["updateEntry", "createEntry", "deleteEntry"]),
+
     loadEntry() {
-      const entry = this.entryById(this.entryId);
-      if (!entry) return this.$router.push({ name: "no-entry" });
+      let entry;
+
+      if (this.entryId === "new") {
+        entry = {
+          text: "",
+          date: new Date().getTime(),
+        };
+      } else {
+        entry = this.entryById(this.entryId);
+        if (!entry) return this.$router.push({ name: "no-entry" });
+      }
       this.entry = entry;
+    },
+
+    async savedEntry() {
+      new Swal({
+        title: "Espere por favor",
+        allowOutsideClick: false,
+      });
+      Swal.showLoading();
+      if (this.entry.id) {
+        await this.updateEntry(this.entry);
+      } else {
+        // crear nueva entrada
+        const entryId = await this.createEntry(this.entry);
+        this.$router.push({ name: "entry", params: { entryId } });
+      }
+      Swal.fire("Guardado", "Entrada guardada correctamente", "success");
+    },
+
+    async onDelete() {
+      const { isConfirmed } = await Swal.fire({
+        title: "Estas seguro?",
+        text: "Una vez borrado no podras recuperar la entrada",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        confirmButtonText: "Si, borrar!",
+        cancelButtonText: "No, cancelar!",
+      });
+      if (isConfirmed) {
+        new Swal({
+          title: "Espere por favor",
+          allowOutsideClick: false,
+        });
+        Swal.showLoading();
+        await this.deleteEntry(this.entry.id);
+        this.$router.push({ name: "no-entry" });
+        Swal.fire("Eliminado", "", "success");
+      }
+    },
+
+    onSelectImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        this.localImage = e.target.result;
+      };
     },
   },
 
