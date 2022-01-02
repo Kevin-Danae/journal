@@ -10,8 +10,16 @@
         Borrar
         <i class="fa fa-trash-alt"></i>
       </button>
-      <input type="file" @change="onSelectImage" />
-      <button class="btn btn-primary">
+
+      <input
+        type="file"
+        @change="onSelectedImage"
+        ref="imageSelector"
+        v-show="false"
+        accept="image/png, image/jpeg"
+      />
+
+      <button class="btn btn-primary" @click="onSelectImage">
         Subir foto
         <i class="fa fa-upload"></i>
       </button>
@@ -28,7 +36,7 @@
 
   <Fab icon="fa-save" @on:click="savedEntry" />
   <img
-    v-if="entry?.picture"
+    v-if="entry?.picture && !localImage"
     :src="entry.picture"
     alt="entry-picture"
     class="img-thumbnail"
@@ -47,6 +55,7 @@ import { defineAsyncComponent } from "@vue/runtime-core";
 import { mapGetters, mapActions } from "vuex";
 import Swal from "sweetalert2";
 import getDate from "../helpers/getDate";
+import uploadImage from "../helpers/uploadImage";
 
 export default {
   props: {
@@ -64,6 +73,7 @@ export default {
     return {
       entry: {},
       localImage: null,
+      file: null,
     };
   },
 
@@ -101,6 +111,8 @@ export default {
         if (!entry) return this.$router.push({ name: "no-entry" });
       }
       this.entry = entry;
+      this.localImage = null;
+      this.file = null;
     },
 
     async savedEntry() {
@@ -109,6 +121,10 @@ export default {
         allowOutsideClick: false,
       });
       Swal.showLoading();
+
+      const picture = await uploadImage(this.file);
+      this.entry.picture = picture;
+
       if (this.entry.id) {
         await this.updateEntry(this.entry);
       } else {
@@ -117,6 +133,9 @@ export default {
         this.$router.push({ name: "entry", params: { entryId } });
       }
       Swal.fire("Guardado", "Entrada guardada correctamente", "success");
+
+      this.file = null;
+      this.localImage = null;
     },
 
     async onDelete() {
@@ -141,14 +160,23 @@ export default {
       }
     },
 
-    onSelectImage(event) {
+    onSelectedImage(event) {
       const file = event.target.files[0];
-      if (!file) return;
+      if (!file) {
+        this.localImage = null;
+        this.file = null;
+        return;
+      }
+      this.file = file;
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = (e) => {
         this.localImage = e.target.result;
       };
+    },
+
+    onSelectImage() {
+      this.$refs.imageSelector.click();
     },
   },
 
