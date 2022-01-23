@@ -58,6 +58,7 @@ import getDate from "../helpers/getDate";
 import uploadImage from "../helpers/uploadImage";
 
 export default {
+  name: "EntryView",
   props: {
     entryId: {
       type: String,
