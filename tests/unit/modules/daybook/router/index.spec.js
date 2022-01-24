@@ -32,4 +32,18 @@ describe("Pruebas en el router module de daybook", () => {
     expect(routes).toContain("NoEntrySelected");
     expect(routes).toContain("EntryView");
   });
+
+  test("Debe de retornar el id de la ruta", () => {
+    const route = {
+      params: {
+        entryId: "ABC-123",
+      },
+    };
+
+    const entryRoute = daybookRouter.children.find(
+      (route) => route.name === "entry"
+    );
+
+    expect(entryRoute.props(route)).toEqual({ entryId: "ABC-123" });
+  });
 });
