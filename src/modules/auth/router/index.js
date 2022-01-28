@@ -4,5 +4,22 @@ export default {
     import(
       /* webpackChunkName: "Auth" */ "@/modules/auth/layouts/AuthLayout.vue"
     ),
-  children: [],
+  children: [
+    {
+      name: "Login",
+      path: "",
+      component: () =>
+        import(
+          /* webpackChunkName: "Login" */ "@/modules/auth/views/Login.vue"
+        ),
+    },
+    {
+      name: "Register",
+      path: "/register",
+      component: () =>
+        import(
+          /* webpackChunkName: "Register" */ "@/modules/auth/views/Register.vue"
+        ),
+    },
+  ],
 };
