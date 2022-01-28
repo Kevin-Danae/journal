@@ -52,7 +52,7 @@
 
 <script>
 import { defineAsyncComponent } from "@vue/runtime-core";
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapState } from "vuex";
 import Swal from "sweetalert2";
 import getDate from "../helpers/getDate";
 import uploadImage from "../helpers/uploadImage";
@@ -82,6 +82,8 @@ export default {
     ...mapGetters({
       entryById: "journal/getEntryById",
     }),
+
+    ...mapState("auth", ["user"]),
     day() {
       const { day } = getDate(this.entry.date);
       return day;
@@ -130,7 +132,10 @@ export default {
         await this.updateEntry(this.entry);
       } else {
         // crear nueva entrada
-        const entryId = await this.createEntry(this.entry);
+        const entryId = await this.createEntry({
+          entry: this.entry,
+          user: this.user?.email,
+        });
         this.$router.push({ name: "entry", params: { entryId } });
       }
       Swal.fire("Guardado", "Entrada guardada correctamente", "success");

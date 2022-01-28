@@ -49,10 +49,13 @@
 
 <script>
 import { reactive } from "@vue/reactivity";
+import { useRouter } from "vue-router";
 import useAuth from "../composables/useAuth";
+import Swal from "sweetalert2";
 
 export default {
   setup() {
+    const router = useRouter();
     const userForm = reactive({
       name: "",
       email: "",
@@ -66,7 +69,8 @@ export default {
 
       onSubmit: async () => {
         const { ok, message } = await createUser(userForm);
-        console.log(ok, message);
+        if (!ok) Swal.fire("Error", message, "error");
+        else router.push({ name: "no-entry" });
       },
     };
   },

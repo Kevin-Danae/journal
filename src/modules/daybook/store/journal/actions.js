@@ -1,8 +1,10 @@
 import journalApi from "@/api/journalApi";
 
 // export const myAction = async ({commit}) => {}
-export const loadEntries = async ({ commit }) => {
-  const { data } = await journalApi.get("/entries.json");
+export const loadEntries = async ({ commit }, email) => {
+  const { data } = await journalApi.get("/entries.json", {
+    params: { orderBy: '"user"', equalTo: `"${email}"`, print: '"pretty"' },
+  });
   if (!data) return commit("setEntries", []);
   const entries = [];
   for (let id of Object.keys(data)) {
@@ -12,7 +14,7 @@ export const loadEntries = async ({ commit }) => {
     });
   }
 
-  commit("setEntries", entries);
+  commit("setEntries", { entries, email });
 };
 
 export const updateEntry = async ({ commit }, entry) => {
@@ -21,9 +23,9 @@ export const updateEntry = async ({ commit }, entry) => {
   commit("updateEntry", { ...entry });
 };
 
-export const createEntry = async ({ commit }, entry) => {
-  const { data } = await journalApi.post("/entries.json", entry);
-  commit("addEntry", { ...entry, id: data.name });
+export const createEntry = async ({ commit }, { entry, user }) => {
+  const { data } = await journalApi.post("/entries.json", { ...entry, user });
+  commit("addEntry", { ...entry, user, id: data.name });
   return data.name;
 };
 

@@ -2,4 +2,17 @@
   <router-view />
 </template>
 
-<style></style>
+<script>
+import useAuth from "./modules/auth/composables/useAuth";
+export default {
+  setup() {
+    const { checkStatus, authStatus } = useAuth();
+
+    checkStatus();
+
+    return {
+      authStatus,
+    };
+  },
+};
+</script>

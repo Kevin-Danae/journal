@@ -35,10 +35,11 @@ export default {
     ...mapActions('journal', ['loadEntries'])
   },
   computed: {
-    ...mapState('journal', ['isLoading'])
+    ...mapState('journal', ['isLoading']),
+    ...mapState('auth', ['user'])
   },
   created() {
-    this.loadEntries();
+    this.loadEntries(this.user?.email);
   }
 };
 </script>
