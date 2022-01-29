@@ -1,6 +1,5 @@
 // export const myAction = (state) => {}
 export const setEntries = (state, { entries, email }) => {
-  console.log(email);
   const entriesByUser = entries.filter((entry) => entry.user === email);
   state.entries = [...state.entries, ...entriesByUser];
   state.isLoading = false;
