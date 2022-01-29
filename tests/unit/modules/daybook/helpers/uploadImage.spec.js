@@ -2,12 +2,12 @@ import cloudinary from "cloudinary";
 import axios from "axios";
 import uploadImage from "@/modules/daybook/helpers/uploadImage";
 
-const { CLOUD_NAME, API_KEY, API_SECRET } = process.env;
+const { VUE_APP_CLOUD_NAME, VUE_APP_API_KEY, VUE_APP_API_SECRET } = process.env;
 
 cloudinary.config({
-  cloud_name: CLOUD_NAME,
-  api_key: API_KEY,
-  api_secret: API_SECRET,
+  cloud_name: VUE_APP_CLOUD_NAME,
+  api_key: VUE_APP_API_KEY,
+  api_secret: VUE_APP_API_SECRET,
 });
 
 describe("Pruebas en el uploadImage", () => {
