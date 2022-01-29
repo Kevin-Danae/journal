@@ -8,7 +8,7 @@
       <input
         v-model="userForm.email"
         class="input100"
-        type="text"
+        type="email"
         placeholder="Correo"
         required
       />
