@@ -14,5 +14,9 @@ export default {
       this.$router.push({ name: "no-entry" });
     },
   },
+
+  mounted() {
+    this.$router.push({ name: "no-entry" });
+  },
 };
 </script>
